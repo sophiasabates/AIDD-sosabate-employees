@@ -1,0 +1,10 @@
+SUCCESS: Created Employee: 001, Smith, Alice, HRD, (123)456-7890
+ERROR: Could not create Employee with data {'id': '002', 'fname': 'Bob1', 'lname': 'Jones', 'department': 'ENG', 'phNumber': '1234567890'}: First name cannot be empty or contain digits.
+ERROR: Could not create Employee with data {'id': '003', 'fname': 'Carol', 'lname': '', 'department': 'MKT', 'phNumber': '1234567890'}: Last name cannot be empty or contain digits.
+ERROR: Could not create Employee with data {'id': '004', 'fname': 'David', 'lname': 'Lee', 'department': 'eng', 'phNumber': '1234567890'}: Department must be exactly 3 uppercase letters.
+ERROR: Could not create Employee with data {'id': '005', 'fname': 'Eve', 'lname': 'Kim', 'department': 'ITD', 'phNumber': '12345'}: Phone number must be exactly 10 digits.
+SUCCESS: Created Employee: 001, Smith, Alice, HRD, (123)456-7890
+ERROR: Could not create Employee with data {'id': '002', 'fname': 'Bob1', 'lname': 'Jones', 'department': 'ENG', 'phNumber': '1234567890'}: First name cannot be empty or contain digits.
+ERROR: Could not create Employee with data {'id': '003', 'fname': 'Carol', 'lname': '', 'department': 'MKT', 'phNumber': '1234567890'}: Last name cannot be empty or contain digits.
+ERROR: Could not create Employee with data {'id': '004', 'fname': 'David', 'lname': 'Lee', 'department': 'eng', 'phNumber': '1234567890'}: Department must be exactly 3 uppercase letters.
+ERROR: Could not create Employee with data {'id': '005', 'fname': 'Eve', 'lname': 'Kim', 'department': 'ITD', 'phNumber': '12345'}: Phone number must be exactly 10 digits.
