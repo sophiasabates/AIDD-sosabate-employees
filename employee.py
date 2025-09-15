@@ -1,191 +1,153 @@
-import csv
-from typing import List
+
+"""
+	CREATE EMPLOYEE CLASS: ENFORCES BUSINESS RULES FOR EMPLOYEE DATA 
+    # attributes: id(string), fname(string), lname(string), department(string), phNumber(string) 
+    -> Use @property decorators for all attributes 
+		Attributes: 
+			id (str): Unique identifier for the employee (Read-only after creation)
+			fname (str): First name of the employee (cannot be empty or contain digits)
+			lname (str): Last name of the employee (cannot be empty or contain digits)
+			department (str): Department code (Must be exactly 3 uppercase letters)
+			phNumber (str): Phone number (valid 10 digits number stored unformatted).
+                  -> Allow users to enter phNumber in formatted stules ((123)-456-7890 or 123.456.7890) and sanitize them into a 10-digit string for storage 
+                  -> Implement a getphNumber method that returns the unformatted 10-digit phone number 
+    -> ensure validation rules are applied consistently 
+    -> Add inheritance and polymporphism: 
+		-> Create a subclass Manager(Employee) with an additional attribute (e.g. team_size or office_number)
+        -> Override a method (such as __str__ or a display() method) to demonstrate polymorphism when listing employees 
+
+    CREATE MANAGER(EMPLOYEE) SUBCLASS:
+		-> Additional attribute: team_size (int): Number of team members managed (must be a non-negative integer)
+		-> Override __str__ method to include team_size in the string representation
+"""
+
+from typing import Any
 import logging
 
-# File to store employee data
-CSV_FILE = "employee_data.csv"
-
-def load_employees() -> List["Employee"]:
-    """
-    Load a list of Employee objects from a CSV file.
-    The CSV must have columns: id, fname, lname, department, phNumber.
-    Returns a list of Employee objects.
-    """
-    employees: List["Employee"] = []
-    with open(CSV_FILE, newline='', encoding='utf-8') as csvfile:
-        reader = csv.DictReader(csvfile)
-        for row in reader:
-            emp = Employee(
-                id=row['id'],
-                fname=row['fname'],
-                lname=row['lname'],
-                department=row['department'],
-                phNumber=row['phNumber']
-            )
-            employees.append(emp)
-    return employees
-
-
-def save_employees(employees: List["Employee"]) -> None:
-    """
-    Save a list of Employee objects to a CSV file.
-    The CSV will have columns: id, fname, lname, department, phNumber.
-    """
-    with open(CSV_FILE, mode='w', newline='', encoding='utf-8') as csvfile:
-        fieldnames = ['id', 'fname', 'lname', 'department', 'phNumber']
-        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-        writer.writeheader()
-        for emp in employees:
-            writer.writerow({
-                'id': emp.id,
-                'fname': emp.fname,
-                'lname': emp.lname,
-                'department': emp.department,
-                'phNumber': emp.phNumber.replace('(','').replace(')','').replace('-','')
-            })
-# class Employee with private attributes, getters/setters, and validation
 class Employee:
-	"""
-	Employee class representing an employee with id, first name, last name, department, and phone number.
-	Attributes are private and accessed via getters and setters with validation.
-	"""
+    def __init__(self, id: str, fname: str, lname: str, department: str, phNumber: str) -> None:
+        self._id = id
+        self.fname = fname
+        self.lname = lname
+        self.department = department
+        self.phNumber = phNumber
 
-	def __init__(self, id: str, fname: str, lname: str, department: str, phNumber: str):
-		self._id = id  # Set directly to make read-only
-		self.fname = fname
-		self.lname = lname
-		self.department = department
-		self.phNumber = phNumber
+    @property
+    def id(self):
+        return self._id
 
-	# id property
-	@property
-	def id(self) -> str:
-		"""Get the employee's ID (read-only after creation)."""
-		return self._id
+    @property
+    def fname(self):
+        return self._fname
 
-	# fname property
-	@property
-	def fname(self) -> str:
-		"""Get the employee's first name."""
-		return self._fname
+    @fname.setter
+    def fname(self, value):
+        if not value or any(char.isdigit() for char in value):
+            raise Exception("First name cannot be empty or contain digits.")
+        self._fname = value
 
-	@fname.setter
-	def fname(self, value: str):
-		if not value or any(char.isdigit() for char in value):
-			raise ValueError("First name cannot be empty or contain digits.")
-		self._fname = value
+    @property
+    def lname(self):
+        return self._lname
 
-	# lname property
-	@property
-	def lname(self) -> str:
-		"""Get the employee's last name."""
-		return self._lname
+    @lname.setter
+    def lname(self, value):
+        if not value or any(char.isdigit() for char in value):
+            raise Exception("Last name cannot be empty or contain digits.")
+        self._lname = value
 
-	@lname.setter
-	def lname(self, value: str):
-		if not value or any(char.isdigit() for char in value):
-			raise ValueError("Last name cannot be empty or contain digits.")
-		self._lname = value
+    @property
+    def department(self):
+        return self._department
 
-	# department property
-	@property
-	def department(self) -> str:
-		"""Get the employee's department (3 uppercase letters)."""
-		return self._department
+    @department.setter
+    def department(self, value):
+        if not (isinstance(value, str) and len(value) == 3 and value.isupper() and value.isalpha()):
+            raise Exception("Department must be exactly 3 uppercase letters.")
+        self._department = value
 
-	@department.setter
-	def department(self, value: str):
-		if not (isinstance(value, str) and len(value) == 3 and value.isupper() and value.isalpha()):
-			raise ValueError("Department must be exactly 3 uppercase letters.")
-		self._department = value
+    @property
+    def phNumber(self):
+        return self._phNumber
 
-	# phNumber property
-	@property
-	def phNumber(self) -> str:
-		"""Get the employee's phone number formatted as (XXX)XXX-XXXX."""
-		rawPhNumber = self._phNumber
-		return f"({rawPhNumber[:3]}){rawPhNumber[3:6]}-{rawPhNumber[6:]}"
+    @phNumber.setter
+    def phNumber(self, value):
+        # Always extract digits from input, regardless of format
+        digits = ''.join([c for c in value if c.isdigit()])
+        if len(digits) != 10:
+            raise Exception("Phone number must be a valid 10-digit number.")
+        self._phNumber = digits
 
-	@phNumber.setter
-	def phNumber(self, value: str):
-		if not (isinstance(value, str) and value.isdigit() and len(value) == 10):
-			raise ValueError("Phone number must be exactly 10 digits.")
-		self._phNumber = value
+    def getphNumber(self):
+        # Return the stored unformatted 10-digit phone number
+        return self._phNumber
+    
+    def __str__(self):
+        return f"Employee: {self.id} - {self.lname}, {self.fname} - {self.department} - {self.phNumber}"
+    
+# Manager subclass with inheritance and polymorphism
+class Manager(Employee):
+    def __init__(self, id: str, fname: str, lname: str, department: str, phNumber: str, team_size: int):
+        super().__init__(id, fname, lname, department, phNumber)
+        self.team_size = team_size
 
+    @property
+    def team_size(self):
+        return self._team_size
 
-def add_employee(employees: List["Employee"], new_employee: "Employee") -> None:
-    """
-    Add a new Employee to the list and save to CSV.
-    Raises ValueError if an Employee with the same ID already exists.
-    """
-    if any(emp.id == new_employee.id for emp in employees):
-        raise ValueError(f"Employee with ID {new_employee.id} already exists.")
-    employees.append(new_employee)
-    save_employees(employees)
+    @team_size.setter
+    def team_size(self, value):
+        if not isinstance(value, int) or value < 0:
+            raise Exception("team_size must be a non-negative integer.")
+        self._team_size = value
 
-
-def edit_employee(employees: List["Employee"], index: int, fname: str = None, lname: str = None, department: str = None, phNumber: str = None) -> None:
-    """
-    Edit an existing Employee's details by index. ID cannot be changed.
-    Raises IndexError if index is out of range. Raises ValueError for invalid data.
-    """
-    if index < 0 or index >= len(employees):
-        raise IndexError("Employee index out of range.")
-    emp = employees[index]
-    try:
-        if fname is not None:
-            emp.fname = fname
-        if lname is not None:
-            emp.lname = lname
-        if department is not None:
-            emp.department = department
-        if phNumber is not None:
-            emp.phNumber = phNumber
-    except ValueError as e:
-        raise ValueError(f"Invalid data: {e}")
-    save_employees(employees)
+    def __str__(self):
+        # Polymorphic string representation
+        return f"Manager: {self.id} - {self.lname}, {self.fname} - {self.department} - {self.phNumber} - Team Size: {self.team_size}"
 
 
-def delete_employee(employees: List["Employee"], index: int) -> None:
-    """
-    Delete an Employee by index and save to CSV.
-    Raises IndexError if index is out of range.
-    """
-    if index < 0 or index >= len(employees):
-        raise IndexError("Employee index out of range.")
-    del employees[index]
-    save_employees(employees)
-
-def display_employees(employees: list["Employee"]) -> None:
-    """
-    Print a numbered list of employees in the format:
-    1. ID - Last, First - Department - Phone
-    """
-    for i, emp in enumerate(employees, start=1):
-        print(f"{i}. {emp.id} - {emp.lname}, {emp.fname} - {emp.department} - {emp.phNumber}")
-
+# Test code under if __name__ == "__main__" to demonstrate: 
+    # Creating valid and invalid employees 
+    # Creating at least one Manager object 
+    # Logging errors to a file (e.g employee_test.log). 
+        # The log should include a timestamp and the specific validation error triggers 
+    
 if __name__ == "__main__":
-    logging.basicConfig(filename="employee_test.log", level=logging.INFO, format='%(message)s')
-    def log(msg):
-        print(msg)
-        logging.info(msg)
+    # Test valid employee
+    try:
+        emp = Employee("1", "John", "Doe", "HRD", "(123)-456-7890")
+        print("Employee created:", emp.fname, emp.lname, emp.department, emp.phNumber)
+    except Exception as e:
+        print("Error creating employee:", e)
+        logging.error("Error creating employee: %s", e)
 
-    test_cases = [
-        # Valid
-        {"id": "001", "fname": "Alice", "lname": "Smith", "department": "HRD", "phNumber": "1234567890"},
-        # Invalid first name (digit)
-        {"id": "002", "fname": "Bob1", "lname": "Jones", "department": "ENG", "phNumber": "1234567890"},
-        # Invalid last name (empty)
-        {"id": "003", "fname": "Carol", "lname": "", "department": "MKT", "phNumber": "1234567890"},
-        # Invalid department (not 3 uppercase)
-        {"id": "004", "fname": "David", "lname": "Lee", "department": "eng", "phNumber": "1234567890"},
-        # Invalid phone (not 10 digits)
-        {"id": "005", "fname": "Eve", "lname": "Kim", "department": "ITD", "phNumber": "12345"},
-    ]
+    # Test invalid employee (invalid first name)
+    try:
+        emp = Employee("2", "John3", "Doe", "HRD", "(123)-456-7890")
+        print("Employee created:", emp.fname, emp.lname, emp.department, emp.phNumber)
+    except Exception as e:
+        print("Caught expected error (invalid first name):", e)
+        logging.error("Invalid first name: %s", e)
 
-    for case in test_cases:
-        try:
-            emp = Employee(**case)
-            log(f"SUCCESS: Created Employee: {emp.id}, {emp.lname}, {emp.fname}, {emp.department}, {emp.phNumber}")
-        except Exception as e:
-            log(f"ERROR: Could not create Employee with data {case}: {e}")
+    # Test invalid employee (invalid department)
+    try:
+        emp = Employee("3", "Jane", "Smith", "it", "1234567890")
+    except Exception as e:
+        print("Caught expected error (invalid department):", e)
+        logging.error("Invalid department: %s", e)
+
+    # Test valid manager
+    try:
+        mgr = Manager("4", "Alice", "Johnson", "MKT", "123.456.7890", 5)
+        print("Manager created:", mgr.fname, mgr.lname, mgr.department, mgr.phNumber, mgr.team_size)
+    except Exception as e:
+        print("Error creating manager:", e)
+        logging.error("Error creating manager: %s", e)
+
+    # Test invalid manager (negative team size)
+    try:
+        mgr = Manager("5", "Bob", "Brown", "FIN", "987-654-3210", -3)
+        print("Manager created:", mgr.fname, mgr.lname, mgr.department, mgr.phNumber, mgr.team_size)
+    except Exception as e:
+        print("Caught expected error (invalid team size):", e)
+        logging.error("Invalid team size: %s", e)

@@ -24,3 +24,68 @@ Copilot Results: The Copilot didn't put validation in the UI code, but rather th
 Step 7: Test Valid and Invalid Data 
 Copilot Response: Test code has been added to the bottom of employee.py that will try to create Employee objects with both valid and invalid data and log successes adn errors to employee_test.log
 Copilot Results: It put import logging in the main function instead of having it at the top with the rest of the imports so I edited that. I tested the valid/invalid employee test by running the test and it provided the correct data. 
+
+
+________________________________________________________________________________________
+Assignment_3 Prompts: 
+
+Copilot Prompt: 
+Write a python class called Employee with the following attributes and ensure to follow the validation rules are applied consistently. For all of the attributes use @property decorators (no old-style getters and setters) 
+
+id (str): Unique identifier for the employee 
+fname (str): First name of the employee 
+lname (str): Last name of the employee
+department (str): Department code 
+phNumber (str): Phone number 
+ 
+Here are the following validation rules, that must be applied consistently: 
+
+id (str): Read-only after creation
+fname (str): cannot be empty or contain digits
+lname (str): cannot be empty or contain digits
+department (str): Must be exactly 3 uppercase letters
+phNumber (str): must be a valid 10-digit number stored unformatted
+Allow users to enter phone numbers in formatted styles such as (123)456-7890 or 123.456.7890 
+Implement a getphNumber method that returns the user inputed phone numbers and then sanitize them into a 10-digit string for storage that returns that returns the unformatted 10-digit phone number. 
+
+Copilot Edits/Results: 
+Wanted me to use the re module (used for regular expressions to remove all non-digit characters froma string) for getphNumber. However, I would rather sanitize them into a 10-digit string for storage without important re module.
+Follow-up Prompt: 
+Is there another way to allow users to enter a number in formatted styles (e.g (123)-456-7890 or 123.456.7890) and sanitize them into a 10-digit storage. With implementing a getphNumber method that returns the unformatted 10-digit phone number?
+Follow-up Copilot Edits/Results: 
+It corrected the getphNumber to allow a user to enter formatted and then store it unformatted. However, I didnt like how it used raise valueError so I changed it to raise Exception ensuring that validations rules are applied consistently. After this, the code worked (checked against python test at the bottom of employee.py file) and made sense to me. 
+
+
+
+Copilot Prompt: 
+Please add inheritance and polymorphism to this next part. Write a python subclass Manager(Employee) with one additional attribute: team_size. For this attribute ensure proper validation rules are applied consistently, such as team_size cannot be negative and use @property decorators for this new attribute: team_size. 
+Override a method (such as str or a display() method to demonstrate polymorphism when listing or printing employees. 
+Copilot Edits/Results: 
+Copilot added a Manager subclass inheriting from Employee, with a team_size attribute that uses property decorators and enforces non0negative integer validation (EX: cannot be negative amount of employees on a team that manager manages). The __str__ method is overridden to demonstrate polymorphism when listing employees. I checked this to make sure it works by adding valid manager/ivalid manager testing at the bottom of employee.py file. 
+Follow-up Copilot Prompt: 
+I feel like I should have a __str__ method in employee class when listing employees since im overriding the method in subclass Manager(Employee), there should be something to override? what is best practice?
+Follow-up Copilot Edits/Results: 
+By following-up with this prompt I was able to get confirmatin that it is best practice to define a __str__ method in Employee class if I am overriding it in the Manager subclass. This way all Employee objecs have a meanfinful string representation, and the polymorphic behavior is clear and intentional. Therefore, I updated the employee class to include this __str__ method. 
+
+
+Copilot Edits/Results: 
+
+
+
+Copilot Prompt: 
+
+
+Copilot Response: 
+
+
+Copilot Edits/Results: 
+
+
+
+Copilot Prompt: 
+
+
+Copilot Response: 
+
+
+Copilot Edits/Results: 
