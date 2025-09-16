@@ -29,7 +29,7 @@ Copilot Results: It put import logging in the main function instead of having it
 ________________________________________________________________________________________
 Assignment_3 Prompts: 
 
-Copilot Prompt: 
+Copilot Prompt: Part 1 
 Write a python class called Employee with the following attributes and ensure to follow the validation rules are applied consistently. For all of the attributes use @property decorators (no old-style getters and setters) 
 
 id (str): Unique identifier for the employee 
@@ -37,7 +37,6 @@ fname (str): First name of the employee
 lname (str): Last name of the employee
 department (str): Department code 
 phNumber (str): Phone number 
- 
 Here are the following validation rules, that must be applied consistently: 
 
 id (str): Read-only after creation
@@ -45,9 +44,8 @@ fname (str): cannot be empty or contain digits
 lname (str): cannot be empty or contain digits
 department (str): Must be exactly 3 uppercase letters
 phNumber (str): must be a valid 10-digit number stored unformatted
-Allow users to enter phone numbers in formatted styles such as (123)456-7890 or 123.456.7890 
-Implement a getphNumber method that returns the user inputed phone numbers and then sanitize them into a 10-digit string for storage that returns that returns the unformatted 10-digit phone number. 
-
+    Allow users to enter phone numbers in formatted styles such as (123)456-7890 or 123.456.7890 
+    Implement a getphNumber method that returns the user inputed phone numbers and then sanitize them into a 10-digit string for storage that returns that returns the unformatted 10-digit phone number. 
 Copilot Edits/Results: 
 Wanted me to use the re module (used for regular expressions to remove all non-digit characters froma string) for getphNumber. However, I would rather sanitize them into a 10-digit string for storage without important re module.
 Follow-up Prompt: 
@@ -68,24 +66,97 @@ Follow-up Copilot Edits/Results:
 By following-up with this prompt I was able to get confirmatin that it is best practice to define a __str__ method in Employee class if I am overriding it in the Manager subclass. This way all Employee objecs have a meanfinful string representation, and the polymorphic behavior is clear and intentional. Therefore, I updated the employee class to include this __str__ method. 
 
 
-Copilot Edits/Results: 
+Copilot Prompt: Part 2
+Write python functions to load and save a list of employee objects from a CSV file named employee_data.csv. 
+Load_employees: Load employees from a CSV file into a list of Employee or Manager objects 
+Return a list of employee and manager objects 
+Save_employees: Save the list of Employee objects to the csv file. 
+Return a function writing back to CSV 
 
+The CSV columns should be id, fname, lname, department, phNumber and team_size for subclass Manager(Employee). For regular employees, not managers, team_size should be 
 
-
-Copilot Prompt: 
-
-
-Copilot Response: 
-
-
-Copilot Edits/Results: 
-
-
-
-Copilot Prompt: 
-
-
-Copilot Response: 
+Remember to call Employee when creating objects. If the file does not exist, return an empty list. 
 
 
 Copilot Edits/Results: 
+Overall Copilot provided a good solution to this prompt. However, I didn't like how it used import os and os.path.exists because we haven't really honed in on that too much in class. 
+Follow-up Copilot Prompt: 
+Please don't use import os. Instead use import from typing import list. 
+Follow-up Edits/Results: 
+I did have to fix the imports based on the first prompt. 
+
+
+Copilot Prompt: Part 3 
+Write the following Python functions in EmployeeView.py
+display_menu() 
+This function displays the menu 
+
+Example display_menu():
+Employee Management System
+1. Create New Employee
+2. Edit Existing Employee
+3. Delete Existing Employee
+4. Display Employees
+5. Quit
+
+
+prompt_for_employee_data() 
+This function should prompt the user to select a menu option and then based on that prompt the user for employee data fields. 
+Return user’s input as a string 
+display_employees() 
+This function should display employees in a clean user-friendly format. 
+This function is called by the Controller whenever the user needs to see the list 
+show_message()
+This function should show messages to the user 
+
+Copilot Edits/Results: 
+The EmployeeView.py should only handle input and output; it should not handle business rules. 
+Copilot created the functions only handling input and output, keeping business logic seperate. 
+
+
+
+Copilot Prompt: Part 4
+In EmployeeApp.py, please help me with the controller in the MVC architecture. Implement menu options that coordinate the flow of the application: 
+It does NOT contain business rules (those are in the model) 
+It does NOT handle user input/output (those are in the view) 
+It does NOT handle file/database access (that's in the data layer) 
+
+The controller's job is to: 
+Receive user actions from the view 
+Manipulate model objects (employee) 
+Save/load data using the data layer 
+Tell the view what to display 
+
+For this, I would like you to write a Python main loop that: 
+Loads employees from CSV at startup 
+Shows a menu with options for Add, Edit, Delete, List, and Quit 
+Calls the correct function based on input 
+Handles invalid input gracefully 
+
+This will result in an implementation  menu with options for: 
+Create (validate input, save new employee) 
+Edit (update employee attributes, but not ID) 
+Delete (remove and employee) 
+Display (list all employees) 
+Quit 
+
+Please ensure that the controller and user interface can handle both Employee and Manager objects (demonstrating polymorphism). 
+Copilot Edit/Results: 
+Copilot produced the controller in the MVC architecture, loading employees, showing a menu with the otions, calling the correct function based on user input, handles both employee and manager objects (polymorphism), and does not contain business rules, input/ouput, or file access logic (those are handled in the model, view, and data layers). This keeps the code modular and maintainable. 
+Copilot Follow-up Propmpt: 
+The code is now throwing errors, unable to run accurately. So I had it fix the errors in the main loop, that weren't allowing the funcction to be complete and correct. 
+Copilot Follow-up Response: 
+I ran the pyhton test, by inserting an employee with their necessary attributes, and then selected display employees. This code worked correctly, and after displaying employees I saw the employee I had created. After, I ran quit I was able to see the employee_data.csv was created. 
+
+
+Copilot Edits/Results: 
+
+Copilot Prompt: Extra Credit 
+Help me create an Automated Testing pytest.py file with 1-2 unit tests for my employee/manager classes. This will demonstrate knoweldge of automated testing practices. 
+Copilot Edits/Results: 
+These creates tests, check for both the employee and manager class, that check object creation, attribute values, and demonstrate polymorphism via the managers string representation. 
+
+
+
+OVERALL: 
+AI didn't generate substrings for most functions or aspects of the python files, so I had to go in and manually add those. However, I do feel like this allowed me to better understand the processes and functionality of the system. 

@@ -1,48 +1,62 @@
+
 """
-    Implement functions to: 
-        -> load_employees: Load employees from a CSV file into a list of Employee or Manager objects 
+    Implement functions to:
+        -> load_employees: Load employees from a CSV file into a list of Employee or Manager objects
         -> save_employees: Save the list of Employee objects to the CSV file
 """
 
-# File to store employee data
+
+import csv
+from typing import List
+from employee import Employee, Manager
+
 CSV_FILE = "employee_data.csv"
 
-def load_employees() -> List["Employee"]:
+def load_employees() -> List[Employee]:
     """
-    Load a list of Employee objects from a CSV file.
-    The CSV must have columns: id, fname, lname, department, phNumber.
-    Returns a list of Employee objects.
+    Load employees from CSV file. Returns a list of Employee and Manager objects.
+    If file does not exist, returns an empty list.
     """
-    employees: List["Employee"] = []
-    with open(CSV_FILE, newline='', encoding='utf-8') as csvfile:
-        reader = csv.DictReader(csvfile)
-        for row in reader:
-            emp = Employee(
-                id=row['id'],
-                fname=row['fname'],
-                lname=row['lname'],
-                department=row['department'],
-                phNumber=row['phNumber']
-            )
-            employees.append(emp)
-    return employees
+    employee_list: List[Employee] = []
+    try:
+        with open(CSV_FILE, mode="r", encoding="utf-8") as file:
+            reader = csv.reader(file)
+            header = next(reader, None)  # Skip header if present
+            for row in reader:
+                # Accept both Employee and Manager rows
+                if len(row) == 6 and row[5].strip() != "":
+                    id, fname, lname, department, phNumber, team_size = row
+                    try:
+                        employee = Manager(id, fname, lname, department, phNumber, int(team_size))
+                        employee_list.append(employee)
+                    except Exception:
+                        continue
+                elif len(row) >= 5:
+                    id, fname, lname, department, phNumber = row[:5]
+                    try:
+                        employee = Employee(id, fname, lname, department, phNumber)
+                        employee_list.append(employee)
+                    except Exception:
+                        continue
+    except FileNotFoundError:
+        pass  # No file yet = no employees
+    return employee_list
 
-
-def save_employees(employees: List["Employee"]) -> None:
+def save_employees(employees: List[Employee]):
     """
-    Save a list of Employee objects to a CSV file.
-    The CSV will have columns: id, fname, lname, department, phNumber.
+    Save a list of Employee/Manager objects to the CSV file.
     """
-    with open(CSV_FILE, mode='w', newline='', encoding='utf-8') as csvfile:
-        fieldnames = ['id', 'fname', 'lname', 'department', 'phNumber']
-        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+    with open(CSV_FILE, mode='w', newline='', encoding='utf-8') as f:
+        fieldnames = ['id', 'fname', 'lname', 'department', 'phNumber', 'team_size']
+        writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
         for emp in employees:
-            writer.writerow({
+            row = {
                 'id': emp.id,
                 'fname': emp.fname,
                 'lname': emp.lname,
                 'department': emp.department,
-                'phNumber': emp.phNumber.replace('(','').replace(')','').replace('-','')
-            })
-
+                'phNumber': emp.phNumber,
+                'team_size': emp.team_size if isinstance(emp, Manager) else ''
+            }
+            writer.writerow(row)

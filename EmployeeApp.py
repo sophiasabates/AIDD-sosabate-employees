@@ -1,52 +1,81 @@
-from employee import load_employees, save_employees, add_employee, edit_employee, delete_employee, print_employees, Employee
+"""
+    Coordinate the Model, Data, and View 
+    -> Implement menu options for: 
+        -> Create (validate input, save new employee)
+        -> Edit (update employee attributes, but not ID)
+        -> Delete (remove an employee)
+        -> Display (list all employees)
+        -> Quit 
+    -> Hanlde errors gracefully and provide clear messages 
+    -> Ensure the controller can handle both Employee and Manager objects (demonstrating polymorphism)
+"""
+
+from EmployeeData import load_employees, save_employees
+from EmployeeView import display_menu, prompt_for_employee_data, display_employees, show_message
+from employee import Employee, Manager
+
+def find_employee_by_id(employees, emp_id):
+    for emp in employees:
+        if emp.id == emp_id:
+            return emp
+    return None
 
 def main():
     employees = load_employees()
+    show_message("Welcome to the Employee Management System!")
     while True:
-        print("\nEmployee Manager Menu:")
-        print("1. List Employees")
-        print("2. Add Employee")
-        print("3. Edit Employee")
-        print("4. Delete Employee")
-        print("5. Quit")
-        choice = input("Select an option (1-5): ").strip()
-        if choice == '1':
-            print_employees(employees)
-        elif choice == '2':
+        display_menu()
+        option = input("Select a menu option (1-5): ").strip()
+        if option == "1":  # Create New Employee
+            data = prompt_for_employee_data("1")
             try:
-                id = input("Enter ID: ").strip()
-                fname = input("Enter First Name: ").strip()
-                lname = input("Enter Last Name: ").strip()
-                department = input("Enter Department (3 uppercase letters): ").strip()
-                phNumber = input("Enter Phone Number (10 digits): ").strip()
-                new_emp = Employee(id=id, fname=fname, lname=lname, department=department, phNumber=phNumber)
-                add_employee(employees, new_emp)
-                print("Employee added.")
+                if 'team_size' in data:
+                    new_emp = Manager(data['id'], data['fname'], data['lname'], data['department'], data['phNumber'], int(data['team_size']))
+                else:
+                    new_emp = Employee(data['id'], data['fname'], data['lname'], data['department'], data['phNumber'])
+                employees.append(new_emp)
+                show_message("Employee added successfully.")
             except Exception as e:
-                print(f"Error adding employee: {e}")
-        elif choice == '3':
-            try:
-                idx = int(input("Enter employee number to edit: ")) - 1
-                fname = input("Enter new First Name (leave blank to keep current): ").strip() or None
-                lname = input("Enter new Last Name (leave blank to keep current): ").strip() or None
-                department = input("Enter new Department (leave blank to keep current): ").strip() or None
-                phNumber = input("Enter new Phone Number (leave blank to keep current): ").strip() or None
-                edit_employee(employees, idx, fname, lname, department, phNumber)
-                print("Employee updated.")
-            except Exception as e:
-                print(f"Error editing employee: {e}")
-        elif choice == '4':
-            try:
-                idx = int(input("Enter employee number to delete: ")) - 1
-                delete_employee(employees, idx)
-                print("Employee deleted.")
-            except Exception as e:
-                print(f"Error deleting employee: {e}")
-        elif choice == '5':
-            print("Goodbye!")
+                show_message(f"Error adding employee: {e}")
+        elif option == "2":  # Edit Existing Employee
+            emp_id = prompt_for_employee_data("2")
+            emp = find_employee_by_id(employees, emp_id)
+            if not emp:
+                show_message("Employee not found.")
+                continue
+            show_message(f"Editing employee: {emp}")
+            # Only allow editing of fields except ID
+            if isinstance(emp, Manager):
+                fields = ['fname', 'lname', 'department', 'phNumber', 'team_size']
+            else:
+                fields = ['fname', 'lname', 'department', 'phNumber']
+            for field in fields:
+                new_value = input(f"Enter new {field} (leave blank to keep current): ").strip()
+                if new_value:
+                    try:
+                        if field == 'team_size' and isinstance(emp, Manager):
+                            setattr(emp, field, int(new_value))
+                        else:
+                            setattr(emp, field, new_value)
+                    except Exception as e:
+                        show_message(f"Invalid value for {field}: {e}")
+            show_message("Employee updated.")
+        elif option == "3":  # Delete Existing Employee
+            emp_id = prompt_for_employee_data("3")
+            emp = find_employee_by_id(employees, emp_id)
+            if emp:
+                employees.remove(emp)
+                show_message("Employee deleted.")
+            else:
+                show_message("Employee not found.")
+        elif option == "4":  # Display Employees
+            display_employees(employees)
+        elif option == "5":  # Quit
+            save_employees(employees)
+            show_message("Employees saved. Goodbye!")
             break
         else:
-            print("Invalid option. Please enter a number from 1 to 5.")
+            show_message("Invalid option. Please try again.")
 
 if __name__ == "__main__":
     main()
